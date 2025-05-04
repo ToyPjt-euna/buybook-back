@@ -1,9 +1,0 @@
-blank_issues_enabled: false
-contact_links: []
-pull_request_templates:
-  - name: "📋 기능 추가/변경"
-    description: "기능 추가/변경을 기록할 때 사용하세요."
-    file: "feat.md"
-  - name: "🛠️ 버그 해결"
-    description: "버그를 어떻게 해결했는지 기록하세요."
-    file: "bug_fix.md"
