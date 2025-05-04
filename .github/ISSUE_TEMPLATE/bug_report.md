@@ -1,7 +1,7 @@
 ---
 name: 🛠️ 버그 해결
 description: 버그를 어떻게 해결했는지 기록하세요.
-title: "[FIX] 기능 수정"
+title: "[Fix] 기능 수정"
 labels: ["bug", "fix"]
 assignees: []
 about: |
@@ -13,7 +13,6 @@ about: |
 ---
 ### 📝 개요
 버그에 대해 간략하게 작성해주세요.
-
 
 <br>
 
