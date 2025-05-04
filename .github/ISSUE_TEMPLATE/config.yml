@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+contact_links: []
+issue_templates:
+  - name: 📋 작업(Task)
+    description: 일반적인 작업 항목을 기록할 때 사용하세요.
+    file: task.md
+  - name: 🛠️ 버그 리포트
+    description: 버그를 어떻게 해결했는지 기록하세요.
+    file: bug_report.md
