@@ -1,11 +1,11 @@
 ---
 name: 📋 작업(Task)
 description: 일반적인 작업 항목을 기록할 때 사용하세요.
-title: "[TASK] "
-labels: ["task"]
+title: "[Feat] 새로운 기능 추가"
+labels: ["feat"]
 assignees: []
 about: |
-  이 템플릿은 작업(Task) 항목을 기록할 때 사용되며, 할 일 목록과 예상 소요 시간 등을 포함합니다.
+  이 템플릿은 작업(Task) 항목을 기록할 때 사용됩니다.
 ---
 
 ## 📋 작업(Task)

@@ -1,7 +1,7 @@
 ---
 name: 🛠️ 버그 해결
 description: 버그를 어떻게 해결했는지 기록하세요.
-title: "[BUG FIX] "
+title: "[Fix] 기능 수정"
 labels: ["bug", "fix"]
 assignees: []
 about: |
@@ -16,16 +16,10 @@ about: |
 
 <br>
 
+### ⏱️ 예상 소요 시간  
+예: 2시간
+
+<br>
+
 ### 🔗 관련 이슈
 예: #123
-
-<br>
-
-### 🧩 원인 분석
-예: 파라미터 누락으로 NullPointerException 발생
-
-<br>
-
-### ✅ 해결 방법
-- [ ] 방법1
-- [ ] 방법2
