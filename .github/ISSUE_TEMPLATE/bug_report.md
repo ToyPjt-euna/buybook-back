@@ -4,6 +4,8 @@ description: 버그를 어떻게 해결했는지 기록하세요.
 title: "[BUG FIX] "
 labels: ["bug", "fix"]
 assignees: []
+about: |
+  이 템플릿은 버그를 해결한 방법과 원인 분석을 기록하는 데 사용됩니다.
 ---
 
 
