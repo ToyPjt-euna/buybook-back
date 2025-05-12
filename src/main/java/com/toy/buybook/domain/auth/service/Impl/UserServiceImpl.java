@@ -7,6 +7,7 @@ import com.toy.buybook.domain.auth.dto.SignupRequest;
 import com.toy.buybook.domain.auth.entity.User;
 import com.toy.buybook.domain.auth.repository.UserRepository;
 import com.toy.buybook.domain.auth.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
+    private final RedisTemplate<String, String> redisTemplate;
     public void signup(SignupRequest request) {
 
         //패스워드 암호화
@@ -47,5 +49,16 @@ public class UserServiceImpl implements UserService {
 
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         return jwtTokenProvider.generateToken(authentication);
+    }
+
+    @Override
+    public void logout(HttpServletRequest request) {
+        String token = jwtTokenProvider.resolveToken(request);
+        if (token == null || !jwtTokenProvider.validateToken(token)) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+
+        String username = jwtTokenProvider.getAuthentication(token).getName();
+        redisTemplate.delete(username); // refresh token 삭제
     }
 }

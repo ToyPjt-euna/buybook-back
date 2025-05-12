@@ -1,6 +1,7 @@
 package com.toy.buybook.domain.auth;
 
 import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
+import org.springframework.util.StringUtils;
 
 
 @Slf4j
@@ -118,4 +119,14 @@ public class JwtTokenProvider {
             return e.getClaims(); // 만료되었지만 클레임은 추출 가능
         }
     }
+
+    //"Bearer " 이후의 토큰만 추출
+    public String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // "Bearer " 이후의 토큰만 추출
+        }
+        return null;
+    }
+
 }

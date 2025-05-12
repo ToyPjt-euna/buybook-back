@@ -42,22 +42,15 @@ public class AuthController {
         return ResponseEntity.ok(token);
     }
 
-//    // ✅ 로그아웃
-//    @PostMapping("/logout")
-//    public ResponseEntity<String> logout(HttpServletRequest request) {
-//        String token = jwtTokenProvider.resolveToken(request);
-//        if (token != null && jwtTokenProvider.validateToken(token)) {
-//            String username = jwtTokenProvider.getAuthentication(token).getName();
-//
-//            // 1. Redis에서 해당 유저의 RefreshToken 제거
-//            redisTemplate.delete(username);
-//
-//            // 2. AccessToken을 블랙리스트 처리 (선택사항)
-//            long expiration = jwtTokenProvider.getExpiration(token);
-//            redisTemplate.opsForValue().set("logout:" + token, "logout", Duration.ofMillis(expiration));
-//
-//            return ResponseEntity.ok("로그아웃 성공");
-//        }
-//        return ResponseEntity.badRequest().body("유효하지 않은 토큰입니다.");
-//    }
+    // ✅ 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        try {
+            userService.logout(request);
+            return ResponseEntity.ok("로그아웃 성공");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("유효하지 않은 토큰입니다.");
+        }
+    }
+
 }
