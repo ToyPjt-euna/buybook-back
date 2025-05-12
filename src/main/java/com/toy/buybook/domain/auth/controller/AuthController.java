@@ -1,22 +1,16 @@
 package com.toy.buybook.domain.auth.controller;
 
 import com.toy.buybook.domain.auth.JwtToken;
-import com.toy.buybook.domain.auth.JwtTokenProvider;
 import com.toy.buybook.domain.auth.dto.LoginRequest;
 import com.toy.buybook.domain.auth.dto.SignupRequest;
 import com.toy.buybook.domain.auth.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Duration;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,9 +18,6 @@ import java.time.Duration;
 public class AuthController {
 
     private final UserService userService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final AuthenticationManager authenticationManager;
-    //private final RedisTemplate<String, String> redisTemplate;
 
     //회원가입
     @PostMapping("/signup")
