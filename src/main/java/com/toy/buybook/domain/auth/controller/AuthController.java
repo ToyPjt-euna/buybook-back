@@ -25,7 +25,7 @@ public class AuthController {
 
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
-    //private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
     //private final RedisTemplate<String, String> redisTemplate;
 
     //회원가입
@@ -35,25 +35,13 @@ public class AuthController {
         return ResponseEntity.ok("회원가입 성공");
     }
 
-//    // ✅ 로그인
-//    @PostMapping("/login")
-//    public ResponseEntity<JwtToken> login(@RequestBody LoginRequest request) {
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-//        );
-//
-//        JwtToken token = jwtTokenProvider.generateToken(authentication);
-//
-//        // Redis에 RefreshToken 저장 (username을 key로 사용)
-//        redisTemplate.opsForValue().set(
-//                authentication.getName(),
-//                token.getRefreshToken(),
-//                Duration.ofMillis(86400000) // 1일
-//        );
-//
-//        return ResponseEntity.ok(token);
-//    }
-//
+    // ✅ 로그인
+    @PostMapping("/login")
+    public ResponseEntity<JwtToken> login(@RequestBody LoginRequest request) {
+        JwtToken token = userService.login(request);
+        return ResponseEntity.ok(token);
+    }
+
 //    // ✅ 로그아웃
 //    @PostMapping("/logout")
 //    public ResponseEntity<String> logout(HttpServletRequest request) {

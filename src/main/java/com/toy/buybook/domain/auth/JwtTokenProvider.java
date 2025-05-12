@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 
 
 @Slf4j

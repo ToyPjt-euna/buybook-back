@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
+    Optional<User> findById(Long id); // userId로 사용자 조회
 }
+
