@@ -15,6 +15,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import io.jsonwebtoken.io.Decoders;
@@ -27,10 +28,11 @@ import org.springframework.util.StringUtils;
 @Component
 public class JwtTokenProvider {
 
-    private static final long ACCESS_TOKEN_VALIDITY = 1000L * 60 * 60 * 24;
-    private static final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24;
+    private static final long ACCESS_TOKEN_VALIDITY = 1000L * 60 * 15;      // 15분
+    private static final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7;  // 7일
 
-    private final Key key;
+
+    private static Key key;
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -38,13 +40,10 @@ public class JwtTokenProvider {
     }
 
     //AccessToken, RefreshToken 생성
-    public JwtToken generateToken(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+    public static JwtToken generateToken(Authentication authentication) {
 
-        String accessToken = createToken(authentication.getName(), authorities, ACCESS_TOKEN_VALIDITY);
-        String refreshToken = createToken(null, null, REFRESH_TOKEN_VALIDITY);
+        String accessToken = createToken(authentication.getName(), ACCESS_TOKEN_VALIDITY);
+        String refreshToken = createToken(null,  REFRESH_TOKEN_VALIDITY);
 
         return JwtToken.builder()
                 .grantType("Bearer")
@@ -53,7 +52,7 @@ public class JwtTokenProvider {
                 .build();
     }
 
-    private String createToken(String subject, String authorities, long validityMillis) {
+    private static String createToken(String subject, long validityMillis) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + validityMillis);
 
@@ -64,9 +63,6 @@ public class JwtTokenProvider {
         if (subject != null) {
             builder.setSubject(subject);
         }
-        if (authorities != null) {
-            builder.claim("auth", authorities);
-        }
 
         return builder.compact();
     }
@@ -75,38 +71,41 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
 
-        String authorityClaim = claims.get("auth", String.class);
-        if (authorityClaim == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+        String role = claims.get("auth", String.class);
+        if (role == null || role.isBlank()) {
+            throw new RuntimeException("JWT에 권한 정보(auth)가 없습니다.");
         }
 
-        Collection<? extends GrantedAuthority> authorities = Arrays.stream(authorityClaim.split(","))
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        // 단일 권한만 처리
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
 
         UserDetails principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     //토큰 유효성 검증
-    public boolean validateToken(String token) {
+// JwtTokenProvider.java
+    public void validateToken(String token) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token);
-            return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.warn("잘못된 JWT 서명입니다.", e);
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.", e);
+            log.info("만료된 JWT 토큰입니다.");
+            throw new JwtTokenExpiredException("AccessToken이 만료되었습니다.");
+        } catch (SecurityException | MalformedJwtException e) {
+            log.warn("잘못된 JWT 서명입니다.");
+            throw new JwtTokenInvalidException("잘못된 JWT 서명입니다.");
         } catch (UnsupportedJwtException e) {
-            log.warn("지원하지 않는 JWT 토큰입니다.", e);
+            log.warn("지원하지 않는 JWT 토큰입니다.");
+            throw new JwtTokenInvalidException("지원하지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            log.warn("JWT 토큰이 비어 있습니다.", e);
+            log.warn("JWT 토큰이 비어 있습니다.");
+            throw new JwtTokenInvalidException("JWT 토큰이 비어 있습니다.");
         }
-        return false;
     }
+
 
     private Claims parseClaims(String accessToken) {
         try {
@@ -128,5 +127,22 @@ public class JwtTokenProvider {
         }
         return null;
     }
+
+    public class JwtTokenExpiredException extends RuntimeException {
+        public JwtTokenExpiredException(String message) {
+            super(message);
+        }
+
+
+    }
+
+    public static class JwtTokenInvalidException extends RuntimeException {
+        public JwtTokenInvalidException(String message) {
+            super(message);
+        }
+
+
+    }
+
 
 }

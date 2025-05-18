@@ -1,20 +1,27 @@
 package com.toy.buybook.domain.auth.controller;
 
 import com.toy.buybook.domain.auth.JwtToken;
-import com.toy.buybook.domain.auth.dto.LoginRequest;
-import com.toy.buybook.domain.auth.dto.SignupRequest;
+import com.toy.buybook.domain.auth.JwtTokenProvider;
+import com.toy.buybook.domain.auth.dto.TokenRequestDto;
+import com.toy.buybook.domain.auth.dto.request.LoginRequest;
+import com.toy.buybook.domain.auth.dto.request.SignupRequest;
 import com.toy.buybook.domain.auth.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
@@ -33,15 +40,21 @@ public class AuthController {
         return ResponseEntity.ok(token);
     }
 
+    @PostMapping("/renewToken")
+    public ResponseEntity<?> renewToken(@RequestBody TokenRequestDto tokenRequest) {
+        JwtToken newToken= userService.renewToken(tokenRequest);
+        return ResponseEntity.ok(newToken);
+    }
+
+
     // ✅ 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
-        try {
-            userService.logout(request);
-            return ResponseEntity.ok("로그아웃 성공");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("유효하지 않은 토큰입니다.");
-        }
+        userService.logout(request);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "로그아웃 성공");
+        response.put("shouldDeleteTokens", true);  // 클라이언트에게 토큰 삭제 지시
+        return ResponseEntity.ok(response.toString());
     }
 
 }

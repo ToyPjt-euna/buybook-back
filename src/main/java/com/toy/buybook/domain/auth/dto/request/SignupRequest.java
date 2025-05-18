@@ -1,4 +1,4 @@
-package com.toy.buybook.domain.auth.dto;
+package com.toy.buybook.domain.auth.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;
